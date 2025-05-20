@@ -1,0 +1,4 @@
+CREATE TABLE employees (
+    id BIGSERIAL  NOT NULL PRIMARY KEY,
+    fio VARCHAR(255)
+);
