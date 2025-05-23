@@ -7,7 +7,7 @@ FROM openjdk:17-jdk-slim
 LABEL PROJECT_NAME=${project.artifactId} \
       PROJECT=${project.id}
 
-EXPOSE 8080
+EXPOSE 8081
 
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
