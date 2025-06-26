@@ -2,7 +2,7 @@ server:
   port: 8081
 spring:
   application:
-    name: MANUFACTURE_SERVICE
+    name: MANUFACTURE-SERVICE
   r2dbc:
     url: r2dbc:postgresql://localhost:5433/manufacture_db
     username: admin
