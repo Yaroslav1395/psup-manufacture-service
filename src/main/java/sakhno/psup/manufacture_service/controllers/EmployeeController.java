@@ -9,7 +9,7 @@ import sakhno.psup.manufacture_service.models.EmployeeEntity;
 import sakhno.psup.manufacture_service.services.EmployeeService;
 
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("api/v1/manufacture-service/employees")
 @RequiredArgsConstructor
 public class EmployeeController {
     private final EmployeeService employeeService;
