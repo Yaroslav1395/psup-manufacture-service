@@ -26,6 +26,7 @@ services:
       - CONFIG_SERVER_USERNAME:myUsername
       - CONFIG_SERVER_PASSWORD:mySecretPassword
       - EUREKA_URL=http://eureka-server:8761/eureka
+      - STORAGE_SERVICE_BASE_URL=lb://STORAGE-SERVICE
     networks:
       - manufacture-net
       - psup-shared-net

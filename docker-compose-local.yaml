@@ -22,6 +22,7 @@ services:
       - SPRING_PROFILES_ACTIVE=local
       - SPRING_R2DBC_URL=r2dbc:postgresql://postgres:5432/manufacture_db
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/manufacture_db
+      - STORAGE_SERVICE_BASE_URL=http://storage-service:8082
     networks:
       - manufacture-net
 
