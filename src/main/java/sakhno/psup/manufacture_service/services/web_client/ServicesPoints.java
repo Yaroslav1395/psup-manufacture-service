@@ -11,7 +11,8 @@ public enum ServicesPoints {
     STORAGE_TEST_UNPROCESSABLE_ENTITY("Выдает неподдерживаемый тип объекта", "api/v1/storage-service/test/unprocessable-entity"),
     STORAGE_TEST_FORBIDDEN("Выдает ошибку сервера", "api/v1/storage-service/test/forbidden"),
     STORAGE_TEST_UNAUTHORIZED("Выдает ошибку сервера", "api/v1/storage-service/test/unauthorized"),
-    STORAGE_TEST_NOT_FOUND("Выдает ошибку ненайденного ресурса", "api/v1/storage-service/test//not-found"),;
+    STORAGE_TEST_NOT_FOUND("Выдает ошибку ненайденного ресурса", "api/v1/storage-service/test//not-found"),
+    TRACE_STORAGE_TEST_SUCCESS("Отвечает успехом. Для проверки трассировки", "api/v1/storage-service/test/product/tracing/success");
 
     private final String description;
     private final String point;

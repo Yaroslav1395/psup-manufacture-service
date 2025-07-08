@@ -1,6 +1,5 @@
 package sakhno.psup.manufacture_service.services.web_client.web_client_test;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
@@ -10,13 +9,18 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiter;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.Tracer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import sakhno.psup.manufacture_service.services.web_client.ServicesPoints;
+import sakhno.psup.manufacture_service.utils.TraceContextUtils;
 
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 //TODO: Удалить после отладки
@@ -32,6 +36,7 @@ import java.util.concurrent.TimeoutException;
  * 7. Fallback метод должен быть единым, иначе цепочка timeLimiter, circuitBreaker, retry не будет корректно отрабатывать.
  */
 @Service
+@Slf4j
 public class StorageServiceTestClientImpl implements StorageServiceTestClient {
     private final WebClient webClient;
     private final Retry retry;
@@ -51,7 +56,8 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> successTestRequest() {
-        return webClient
+        log.info("Успешный запрос на склад: {}", Thread.currentThread().getName());
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_SUCCESS.getPoint())
                 .retrieve()
@@ -62,12 +68,13 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
                 .transformDeferred(TimeLimiterOperator.of(timeLimiter))
                 .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                 .transformDeferred(RetryOperator.of(retry))
-                .onErrorResume(Exception.class, this::fallback);
+                .onErrorResume(Exception.class, this::fallback)
+        );
     }
 
     @Override
     public Mono<String> errorTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_ERROR.getPoint())
                 .retrieve()
@@ -78,12 +85,13 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
                 .transformDeferred(TimeLimiterOperator.of(timeLimiter))
                 .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                 .transformDeferred(RetryOperator.of(retry))
-                .onErrorResume(Exception.class, this::fallback);
+                .onErrorResume(Exception.class, this::fallback)
+        );
     }
 
     @Override
     public Mono<String> timeoutTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_TIMEOUT.getPoint())
                 .retrieve()
@@ -91,52 +99,74 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
                 .transformDeferred(TimeLimiterOperator.of(timeLimiter))
                 .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                 .transformDeferred(RetryOperator.of(retry))
-                .onErrorResume(Exception.class, this::fallback);
+                .onErrorResume(Exception.class, this::fallback)
+        );
     }
 
     @Override
     public Mono<String> badRequestTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_BAD_REQUEST.getPoint())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+        );
     }
 
     @Override
     public Mono<String> unprocessableEntityTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_UNPROCESSABLE_ENTITY.getPoint())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+        );
     }
 
     @Override
     public Mono<String> forbiddenTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_FORBIDDEN.getPoint())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+        );
     }
 
     @Override
     public Mono<String> notFoundTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_NOT_FOUND.getPoint())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+        );
     }
 
     @Override
     public Mono<String> unauthorizedTestRequest() {
-        return webClient
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_UNAUTHORIZED.getPoint())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+        );
+    }
+
+    @Override
+    public Mono<String> tracingSuccessTestRequest() {
+        return TraceContextUtils.withTraceParent(traceParent -> webClient
+                    .get()
+                    .uri(ServicesPoints.TRACE_STORAGE_TEST_SUCCESS.getPoint())
+                    .headers(headers -> TraceContextUtils.setTraceToHeaders(traceParent, headers))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnNext(response -> log.info("Success received response in thread: {}", Thread.currentThread().getName()))
+                    .transformDeferred(TimeLimiterOperator.of(timeLimiter))
+                    .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+                    .transformDeferred(RetryOperator.of(retry))
+                    .onErrorResume(Exception.class, this::fallback)
+        );
     }
 
     public Mono<String> fallback(Throwable t) {

@@ -20,4 +20,6 @@ public interface StorageServiceTestClient {
     Mono<String> notFoundTestRequest();
 
     Mono<String> unauthorizedTestRequest();
+
+    Mono<String> tracingSuccessTestRequest();
 }
