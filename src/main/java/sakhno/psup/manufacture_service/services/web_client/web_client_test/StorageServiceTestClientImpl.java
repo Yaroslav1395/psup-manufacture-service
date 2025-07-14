@@ -155,6 +155,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> tracingSuccessTestRequest() {
+        log.info("Отработка успешного запроса на склад c трассировкой");
         return TraceContextUtils.withTraceParent(traceParent -> webClient
                     .get()
                     .uri(ServicesPoints.TRACE_STORAGE_TEST_SUCCESS.getPoint())

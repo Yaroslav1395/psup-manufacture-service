@@ -19,23 +19,8 @@ public class TracingTestController {
     private final StorageServiceTestClient storageServiceTestClient;
 
     @GetMapping("/success")
-    public Mono<ResponseEntity<String>> storageSuccess(
-            ServerHttpRequest request) {
-        String traceParent = request.getHeaders().getFirst("traceparent");
-        log.info("traceParent: {}", traceParent);
-        String traceId = null;
-        String spanId = null;
-
-        if (traceParent != null) {
-            String[] parts = traceParent.split("-");
-            if (parts.length >= 3) {
-                traceId = parts[1];
-                spanId = parts[2];
-            }
-        }
-
-        log.info("traceId: {}, spanId: {}", traceId, spanId);
-
+    public Mono<ResponseEntity<String>> storageSuccess() {
+        log.info("Запрос на получение успеха с трассировкой");
         return storageServiceTestClient.tracingSuccessTestRequest()
                 .map(ResponseEntity::ok);
     }
