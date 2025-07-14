@@ -9,18 +9,14 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiter;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import sakhno.psup.manufacture_service.services.web_client.ServicesPoints;
 import sakhno.psup.manufacture_service.utils.TraceContextUtils;
 
-import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 //TODO: Удалить после отладки
@@ -42,22 +38,25 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
     private final Retry retry;
     private final TimeLimiter timeLimiter;
     private final CircuitBreaker circuitBreaker;
+    private final TraceContextUtils traceContextUtils;
 
     public StorageServiceTestClientImpl(
             @Qualifier("storageServiceWebClient") WebClient storageWebClient,
             RetryRegistry retryRegistry,
             TimeLimiterRegistry timeLimiterRegistry,
-            CircuitBreakerRegistry circuitBreakerRegistry) {
+            CircuitBreakerRegistry circuitBreakerRegistry,
+            TraceContextUtils traceContextUtils) {
         this.webClient = storageWebClient;
         this.retry = retryRegistry.retry("STORAGE-SERVICE");
         this.timeLimiter = timeLimiterRegistry.timeLimiter("STORAGE-SERVICE");
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("STORAGE-SERVICE");
+        this.traceContextUtils = traceContextUtils;
     }
 
     @Override
     public Mono<String> successTestRequest() {
         log.info("Успешный запрос на склад: {}", Thread.currentThread().getName());
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_SUCCESS.getPoint())
                 .retrieve()
@@ -74,7 +73,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> errorTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_ERROR.getPoint())
                 .retrieve()
@@ -91,7 +90,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> timeoutTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_TIMEOUT.getPoint())
                 .retrieve()
@@ -105,7 +104,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> badRequestTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_BAD_REQUEST.getPoint())
                 .retrieve()
@@ -115,7 +114,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> unprocessableEntityTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_UNPROCESSABLE_ENTITY.getPoint())
                 .retrieve()
@@ -125,7 +124,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> forbiddenTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_FORBIDDEN.getPoint())
                 .retrieve()
@@ -135,7 +134,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> notFoundTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_NOT_FOUND.getPoint())
                 .retrieve()
@@ -145,7 +144,7 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
 
     @Override
     public Mono<String> unauthorizedTestRequest() {
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                 .get()
                 .uri(ServicesPoints.STORAGE_TEST_UNAUTHORIZED.getPoint())
                 .retrieve()
@@ -156,10 +155,10 @@ public class StorageServiceTestClientImpl implements StorageServiceTestClient {
     @Override
     public Mono<String> tracingSuccessTestRequest() {
         log.info("Отработка успешного запроса на склад c трассировкой");
-        return TraceContextUtils.withTraceParent(traceParent -> webClient
+        return traceContextUtils.withTraceParent(traceParent -> webClient
                     .get()
                     .uri(ServicesPoints.TRACE_STORAGE_TEST_SUCCESS.getPoint())
-                    .headers(headers -> TraceContextUtils.setTraceToHeaders(traceParent, headers))
+                    .headers(headers -> traceContextUtils.setTraceToHeaders(traceParent, headers))
                     .retrieve()
                     .bodyToMono(String.class)
                     .doOnNext(response -> log.info("Success received response in thread: {}", Thread.currentThread().getName()))
