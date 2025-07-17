@@ -23,6 +23,11 @@ services:
       - SPRING_R2DBC_URL=r2dbc:postgresql://postgres:5432/manufacture_db
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/manufacture_db
       - STORAGE_SERVICE_BASE_URL=http://storage-service:8082
+      - KAFKA_BROKERS=broker-1:9094,broker-2:9095,broker-3:9096
+      - KAFKA_DELIVERY_TIMEOUT_MS=20000
+      - KAFKA_LINGER_MS=0
+      - KAFKA_REQUEST_TIMEOUT_MS=10000
+      - KAFKA_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION=5
     volumes:
       - ~/Universal_Trade_Platform/logs/manufacture-service:/root/Universal_Trade_Platform/logs/manufacture-service
     networks:
