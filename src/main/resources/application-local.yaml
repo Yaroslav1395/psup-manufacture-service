@@ -14,6 +14,26 @@ spring:
     url: jdbc:postgresql://localhost:5433/manufacture_db
     user: admin
     password: admin
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+  kafka:
+    producer:
+      bootstrap-servers: ${KAFKA_BROKERS:localhost:9094,localhost:9095,localhost:9096}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        delivery-timeout-ms: ${KAFKA_DELIVERY_TIMEOUT_MS:20000}
+        linger-ms: ${KAFKA_LINGER_MS:0}
+        request.timeout.ms: ${KAFKA_REQUEST_TIMEOUT_MS:10000}
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: ${KAFKA_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION:5}
+        spring.json.trusted.packages: sakhno.psup.manufacture_service.events
+        spring.json.type.mapping: >
+          storageTestEvent:sakhno.psup.manufacture_service.events.producer.StorageTestEvent
 resilience4j:
   circuitbreaker:
     configs:
@@ -72,10 +92,10 @@ logging:
   pattern:
     level: "%5p [${spring.application.name}, trace=%X{traceId:-}, span=%X{spanId:-}]"
   level:
-    org.springframework.data.r2dbc: DEBUG
-    io.github.resilience4j: DEBUG
-    reactor.retry: DEBUG
-    org.springframework.cloud.circuitbreaker: DEBUG
+    org.springframework.data.r2dbc: INFO
+    io.github.resilience4j: INFO
+    reactor.retry: INFO
+    org.springframework.cloud.circuitbreaker: INFO
 log:
   path: ${user.home}/Universal_Trade_Platform/logs/manufacture-service
 storage:
