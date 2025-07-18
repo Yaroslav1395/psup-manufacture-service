@@ -1,4 +1,4 @@
-package sakhno.psup.manufacture_service.services.kafka;
+package sakhno.psup.manufacture_service.config.kafka;
 
 import lombok.Getter;
 

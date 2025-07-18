@@ -11,7 +11,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import sakhno.psup.manufacture_service.services.kafka.KafkaTopicNames;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +63,8 @@ public class KafkaConfig {
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getProperty("spring.kafka.producer.bootstrap-servers"));
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+                environment.getProperty("spring.kafka.producer.bootstrap-servers"));
         return new KafkaAdmin(configs);
     }
 
