@@ -14,11 +14,6 @@ spring:
     url: jdbc:postgresql://localhost:5433/manufacture_db
     user: admin
     password: admin
-  cloud:
-    discovery:
-      enabled: false
-    config:
-      enabled: false
   kafka:
     producer:
       bootstrap-servers: ${KAFKA_BROKERS:localhost:9094,localhost:9095,localhost:9096}
