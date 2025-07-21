@@ -27,7 +27,7 @@ public class KafkaConfig {
      * @return - словарь с настройками
      */
     @Bean
-    Map<String, Object> producerConfigs(){
+    public Map<String, Object> producerConfigs(){
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 environment.getProperty("spring.kafka.producer.bootstrap-servers"));
@@ -74,7 +74,7 @@ public class KafkaConfig {
      * @return - фабрика по созданию kafka producer
      */
     @Bean
-    ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
@@ -83,17 +83,17 @@ public class KafkaConfig {
      * Использует фабрику продюсера для создания и настройки Kafka-продюсеров.
      */
     @Bean
-    KafkaTemplate<String, Object> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     /**
-     * Бин для создания Kafka-топика с именем "product-created-events-topic".
+     * Бин для создания Kafka-топика с именем "manufacture-test-topic".
      * Топик имеет 3 партиции, 3 реплики и настраиваемое количество реплик, которые должны быть синхронизированы для
      * обеспечения отказоустойчивости.
      */
     @Bean
-    NewTopic createTopic() {
+    public NewTopic createTopic() {
         return TopicBuilder
                 .name(KafkaTopicNames.MANUFACTURE_TEST_TOPIC.getTopicName())
                 .partitions(3)
