@@ -15,6 +15,14 @@ spring:
     user: admin
     password: admin
   kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA_BROKERS:localhost:9094,localhost:9095,localhost:9096}
+      group-id: manufacture-service
+      auto-offset-reset: latest
+      properties:
+        spring.json.trusted.packages: sakhno.psup.manufacture_service.events.consumer
+        spring.json.type.mapping: >
+          manufactureTestEvent:sakhno.psup.manufacture_service.events.consumer.ManufactureTestEvent
     producer:
       bootstrap-servers: ${KAFKA_BROKERS:localhost:9094,localhost:9095,localhost:9096}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
