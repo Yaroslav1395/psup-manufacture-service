@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaTestServiceImpl implements KafkaTestService {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;;
 
     @Override
     public String sendTestMessageToTopicManufactureTestEvent(ManufactureKafkaTestDto manufactureKafkaTestDto) {
