@@ -75,10 +75,10 @@ logging:
   pattern:
     level: "%5p [${spring.application.name}, trace=%X{traceId:-}, span=%X{spanId:-}]"
   level:
-    org.springframework.data.r2dbc: DEBUG
-    io.github.resilience4j: DEBUG
-    reactor.retry: DEBUG
-    org.springframework.cloud.circuitbreaker: DEBUG
+    org.springframework.data.r2dbc: INFO
+    io.github.resilience4j: INFO
+    reactor.retry: INFO
+    org.springframework.cloud.circuitbreaker: INFO
 log:
   path: ${user.home}/Universal_Trade_Platform/logs/manufacture-service
 storage:

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import sakhno.psup.manufacture_service.models.EmployeeEntity;
-import sakhno.psup.manufacture_service.services.EmployeeService;
+import sakhno.psup.manufacture_service.services.employee.EmployeeService;
 
 @RestController
 @RequestMapping("api/v1/manufacture-service/employees")
